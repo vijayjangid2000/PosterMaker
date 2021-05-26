@@ -4,28 +4,39 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
+
 public class UserData {
+
+    /* do not use this class directly  (use propertiesz instance instead)
+     * Use posterProperties class to get any type of data,
+     * Here we store user data which is saved in SharedPreferences
+     * Like User details to show on the poster
+     * Poster detailing like colors and background */
 
     /* Fields that are transient cannot be part of serialization (will not save in Gson) */
     private transient final String USER_DATA_SP = "userDataSP1";
     private transient final String USER_DATA_JSON = "userDataJson1";
     private transient SharedPreferences sharedPref;
     private transient SharedPreferences.Editor sPrefEditor;
-    private transient Context context;
-    private transient Bitmap bitmapFace, bitmapBusIcon;
+    private static UserData userData;
 
-    String whatsAppInfo, facebookInfo, twitterInfo, InstagramInfo;
-    int drawableWhsAp, drawableFb, drawableInsta, drawableTwtr;
+    private transient Bitmap bmFB, bmInsta, bmTwitr, bmWhsap;
 
-    String name, userPostDetails,
+    String whatsAppInfo, facebookInfo, twitterInfo, InstagramInfo, fontChosenKey;
+    private int drawableWhsAp, drawableFb, drawableInsta, drawableTwtr;
+
+    private String name, userPostDetails,
             businessName, businessDetails, businessLocation,
             websiteUrl, businessEmail;
 
-    String decodableFaceString, decodableBusinessString;
+    private String faceByteArrayString, posterByteArrayString;
+
 
     /* NOTE: TO add more parameters
      *  Add them globally and then add them in
@@ -39,9 +50,8 @@ public class UserData {
      * in method -> public Bitmap getCombinedFooter()
      * then also initialize it in constructor  */
 
-    public UserData(Context context) {
+    private UserData(Context context) {
 
-        this.context = context;
         sharedPref = context.getSharedPreferences(USER_DATA_SP, Context.MODE_PRIVATE);
         sPrefEditor = sharedPref.edit();
         sPrefEditor.apply();
@@ -57,13 +67,63 @@ public class UserData {
             Gson gson = new Gson();
             UserData userData = gson.fromJson(jsonString, UserData.class);
             setUserDataFromJson(userData);
+            createSocialBitmaps(context); // we need this only once
             // now we have assigned previous (old) data to this object
-        } else {
-            Toast.makeText(context, "NO DATA FOUND", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void applyUpdate() {
+    public static UserData getInstance(Context context) {
+        if (userData == null) userData = new UserData(context.getApplicationContext());
+        return userData;
+    }
+
+    public static UserData getInstance() {
+        return userData; // WARNING: only when you are sure that it has been created already
+    }
+
+    public boolean canCreatePoster() {
+        return posterByteArrayString != null && faceByteArrayString != null;
+    }
+
+    void initializeAllStrings() {
+
+        name = "Vijay Jangid";
+        userPostDetails = "Join Open Innovations";
+
+        whatsAppInfo = "+91 9999988888";
+        facebookInfo = "@facebook.com";
+        twitterInfo = "@twitter.com";
+        InstagramInfo = "@instagram.com";
+
+        drawableWhsAp = R.drawable.whatsapp;
+        drawableFb = R.drawable.facebook;
+        drawableInsta = R.drawable.instagram;
+        drawableTwtr = R.drawable.twitter;
+
+        businessName = "Vijay Company";
+        businessDetails = "Company Details";
+        businessLocation = "Jaipur";
+        businessEmail = "vijay@gmail.com";
+        websiteUrl = "Website Url";
+        faceByteArrayString = null;
+        posterByteArrayString = null;
+
+        fontChosenKey = "sans-serif-medium";
+    }
+
+    private void createSocialBitmaps(Context context) {
+
+        bmFB = Utility.getInstance().resizeBitmapNormal(
+                BitmapFactory.decodeResource(context.getResources(), drawableFb));
+        bmInsta = Utility.getInstance().resizeBitmapNormal(
+                BitmapFactory.decodeResource(context.getResources(), drawableInsta));
+        bmTwitr = Utility.getInstance().resizeBitmapNormal(
+                BitmapFactory.decodeResource(context.getResources(), drawableTwtr));
+        bmWhsap = Utility.getInstance().resizeBitmapNormal(
+                BitmapFactory.decodeResource(context.getResources(), drawableWhsAp));
+    }
+
+    public void applyUpdate(Context context) {
 
         /* TO UPDATE DATA FOLLOW THESE STEPS
          * 1. Create the object (created by old json automatically)
@@ -73,11 +133,11 @@ public class UserData {
          * 5. HOW? updated strings gets replaced and others will be there as it is
          *  */
 
-        sharedPref = context.getSharedPreferences(USER_DATA_SP, Context.MODE_PRIVATE);
+        sharedPref = context.getSharedPreferences(USER_DATA_SP,
+                Context.MODE_PRIVATE);
         sPrefEditor = sharedPref.edit();
         sPrefEditor.putString(USER_DATA_JSON, new Gson().toJson(this));
         sPrefEditor.apply();
-
     }
 
     // internal used method
@@ -98,44 +158,13 @@ public class UserData {
         this.twitterInfo = userData.twitterInfo;
         this.facebookInfo = userData.facebookInfo;
         this.whatsAppInfo = userData.whatsAppInfo;
-        this.decodableFaceString = userData.decodableFaceString;
-        this.decodableBusinessString = userData.decodableBusinessString;
+        this.fontChosenKey = userData.fontChosenKey;
+        this.faceByteArrayString = userData.faceByteArrayString;
+        this.posterByteArrayString = userData.posterByteArrayString;
 
-        // these are transient -> not saved in sharedPref
-        this.bitmapBusIcon = new Utility().resizeBitmap(BitmapFactory.
-                decodeFile(decodableBusinessString), 1920, 1080);
-        this.bitmapFace = new Utility().resizeBitmap(BitmapFactory.
-                decodeFile(decodableFaceString), 1920, 1080);
-    }
-
-    void initializeAllStrings() {
-
-        name = "Vijay Jangid";
-        userPostDetails = "Join Open Innovations";
-
-        whatsAppInfo = "+91 8953829329";
-        facebookInfo = "facebook.com";
-        twitterInfo = "twitter.com";
-        InstagramInfo = "instagram.com";
-
-        drawableWhsAp = R.drawable.whatsapp;
-        drawableFb = R.drawable.facebook;
-        drawableInsta = R.drawable.instagram;
-        drawableTwtr = R.drawable.twitter;
-
-        businessName = "Vijay Company";
-        businessDetails = "Company Details";
-        businessLocation = "Jaipur";
-        businessEmail = "vijay@gmail.com";
-        websiteUrl = "Website Url";
-
-        decodableFaceString = "anything";
-        decodableBusinessString = "anything";
     }
 
     // Getter setters
-
-
     public String getName() {
         return name;
     }
@@ -182,14 +211,6 @@ public class UserData {
 
     public void setInstagramInfo(String instagramInfo) {
         InstagramInfo = instagramInfo;
-    }
-
-    public int getDrawableWhsAp() {
-        return drawableWhsAp;
-    }
-
-    public void setDrawableWhsAp(int drawableWhsAp) {
-        this.drawableWhsAp = drawableWhsAp;
     }
 
     public int getDrawableFb() {
@@ -256,27 +277,53 @@ public class UserData {
         this.businessEmail = businessEmail;
     }
 
-    public String getDecodableFaceString() {
-        return decodableFaceString;
+    public Bitmap getBmFB() {
+        return bmFB;
     }
 
-    public void setDecodableFaceString(String decodableFaceString) {
-        this.decodableFaceString = decodableFaceString;
+    public Bitmap getBmInsta() {
+        return bmInsta;
     }
 
-    public String getDecodableBusinessString() {
-        return decodableBusinessString;
+    public Bitmap getBmTwitr() {
+        return bmTwitr;
     }
 
-    public void setDecodableBusinessString(String decodableBusinessString) {
-        this.decodableBusinessString = decodableBusinessString;
+    public Bitmap getBmWhsap() {
+        return bmWhsap;
     }
 
     public Bitmap getBitmapFace() {
-        return bitmapFace;
+        if (faceByteArrayString == null) return null;
+        return toBitmap(faceByteArrayString);
     }
 
-    public Bitmap getBitmapBusIcon() {
-        return bitmapBusIcon;
+    public Bitmap getBitmapPoster() {
+        if (posterByteArrayString == null) return null;
+        return toBitmap(posterByteArrayString);
+    }
+
+
+    public void setFaceByteArrayString(Bitmap bitmapFace) {
+        this.faceByteArrayString = getBase64String(bitmapFace);
+    }
+
+    public void setPosterByteArrayString(Bitmap bitmapPoster) {
+        this.posterByteArrayString = getBase64String(bitmapPoster);
+    }
+
+    private String getBase64String(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        return android.util.Base64.encodeToString(imageBytes,
+                Base64.DEFAULT);
+    }
+
+    private Bitmap toBitmap(String base64String) {
+        byte[] decodedByteArray = android.util.
+                Base64.decode(base64String, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedByteArray,
+                0, decodedByteArray.length);
     }
 }

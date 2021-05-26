@@ -29,13 +29,20 @@ android {
 
 dependencies {
 
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.exifinterface:exifinterface:1.3.2'
+
+    // test
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-
-    /* for saving objects of classes in shared preferences as json */
     implementation 'com.google.code.gson:gson:2.8.6'
+
+    // https://mvnrepository.com/artifact/com.theapache64.removebg/removebg
+    implementation group: 'com.theapache64.removebg', name: 'removebg', version: '1.0.0'
+
+
+
 }

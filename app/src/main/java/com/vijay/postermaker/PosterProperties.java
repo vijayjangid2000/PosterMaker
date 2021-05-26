@@ -5,16 +5,20 @@ import android.util.Log;
 
 import java.util.List;
 
-public class Properties {
+public class PosterProperties {
 
-    /* This class is dynamic, nothing is stored in it.
+    /* VERY IMP: After setting poster, also do setFace to get dimensions for face */
+
+    /*This class do not have any relation  to UserData class */
+
+    /* This class is dynamic, nothing is stored in it for permanent.
      * To resize the face image, footer length, text size or icon size or padding
      * Change the ratio below, these are ratio to poster.,
      * Like footerHeightRatio = 16 means footer is 1/16 times of poster height */
 
     float footerHeightRatioToPosterHeight = 16; //  this is dynamic, so no matter what value is here
     final float footerPaddingRatioToFooterHeight = 10;
-    final float posterPaddingRatioToWidth = 28; // padding is 1/x times poster width
+    final float posterPaddingRatioToWidth = 32; // padding is 1/x times poster width
     final float textSizeRatioToFooter = 2; // textSize is 1/x times footer height
     final float iconHeightRatioToFooter = 1;  // 1/x times footer height
     final float singleFooterGapeRatioToIconHeight = 1.5f; // 1/x times of icon width
@@ -22,10 +26,11 @@ public class Properties {
     final float faceSizeRatioToPoster = 3; // face size is 1/3 times of poster
 
     // Do not make changes below for resizing the image
-    private static Properties properties; // for making it singleton
+    private static PosterProperties posterProperties; // for making it singleton
 
     List<Bitmap> listSingleFooters;
     Bitmap poster, face;
+    String fontChosenKey;
 
     float posterHeight, posterWidth;
     float footerHeight, footerWidth, footerPadding;
@@ -39,10 +44,17 @@ public class Properties {
 
     float currentSingleFooterWidth = 0;
 
-    private Properties(Bitmap poster) {
+    private PosterProperties(Bitmap poster) {
         //this.context = context;
         this.poster = poster;
-        calculateValues();
+        try {
+            calculateValues();
+        } catch (Exception e) {
+            Log.d("Error Log", "PosterProperties: " +
+                    "This is happening because the poster bitmap or Face bitmap is Null" +
+                    ". You should check the bitmaps where you are creating the object of this class.");
+            e.printStackTrace();
+        }
     }
 
     private void calculateValues() {
@@ -59,7 +71,7 @@ public class Properties {
 
         minimumSingleFooterGape = iconHeightWidth / singleFooterGapeRatioToIconHeight;
         nameTextSize = textSize * nameTextSizeRationToFooterText;
-        paddingPoster = posterWidth/posterPaddingRatioToWidth;
+        paddingPoster = posterWidth / posterPaddingRatioToWidth;
     }
 
     // After the single footers created, pass the list here
@@ -72,37 +84,40 @@ public class Properties {
         for (int i = 0; i < listSingleFooters.size(); i++) {
             Bitmap bitmap = listSingleFooters.get(i);
             sumSingleFootersWidth += bitmap.getWidth();
-            Log.d("VJ W", "Width of each footer: "
-                    + i + " - " + bitmap.getWidth());
         }
 
         singleFooterGape = ((posterWidth - sumSingleFootersWidth - (2 * footerPadding))
                 / (listSingleFooters.size() - 1));
 
-
-        Log.d("VJ gape", "Gape of each footer: " + singleFooterGape);
+        Log.d("Resizing Text: ", "Gape Increased To: " + singleFooterGape);
     }
 
     // After attaching footer call setFace
     public void setFace(Bitmap face) {
-        this.face = face;
+        try {
+            this.face = face;
 
-        faceHeight = face.getHeight();
-        faceWidth = face.getWidth();
+            faceHeight = face.getHeight();
+            faceWidth = face.getWidth();
 
-        faceDestinationX = posterWidth - faceWidth - paddingPoster;
-        faceDestinationY = posterHeight - footerHeight - faceHeight - paddingPoster;
+            faceDestinationX = posterWidth - faceWidth - paddingPoster;
+            faceDestinationY = posterHeight - footerHeight - faceHeight;
+        }catch (Exception e){
+            Log.d("Error: ", "setFace: " + "Reason: Because the face image bitmap" +
+                    "is null here. PLease check where are you calling the setFace() method" +
+                    "and check if the bitmap is not null" );
+            e.printStackTrace();
+        }
     }
 
 
-
-    public static Properties getInstance() {
-        return properties; // make sure to create a object before
+    public static PosterProperties getInstance() {
+        return posterProperties; // make sure to create a object before
     }
 
-    public static Properties build(Bitmap poster) {
-        if (properties == null) properties = new Properties(poster);
-        return properties; // make sure to create a object before
+    protected static PosterProperties buildNewProperties(Bitmap poster) {
+        posterProperties = new PosterProperties(poster);
+        return posterProperties; // make sure to create a object before
     }
 
     // If we set this then all things changes with that

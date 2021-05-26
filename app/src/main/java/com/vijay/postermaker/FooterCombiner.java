@@ -17,7 +17,7 @@ public class FooterCombiner extends View {
     float nextPointOnXaxis;
 
     List<Bitmap> listBitmap;
-    Properties properties;
+    PosterProperties posterProperties;
 
     Paint backgroundPaint;
 
@@ -28,7 +28,7 @@ public class FooterCombiner extends View {
     public FooterCombiner(Context context, List<Bitmap> list) {
         super(context);
         listBitmap = list;
-        properties = Properties.getInstance();
+        posterProperties = PosterProperties.getInstance();
 
         backgroundPaint = new Paint();
         backgroundPaint.setColor(Color.WHITE);
@@ -40,13 +40,13 @@ public class FooterCombiner extends View {
 
         canvas.drawPaint(backgroundPaint);
 
-        nextPointOnXaxis = properties.footerPadding;
+        nextPointOnXaxis = posterProperties.footerPadding;
 
         // here without left,right padding
 
         for (int i = 0; i < listBitmap.size(); i++) {
             canvas.drawBitmap(listBitmap.get(i), nextPointOnXaxis, 0, null);
-            nextPointOnXaxis += listBitmap.get(i).getWidth() + properties.singleFooterGape;
+            nextPointOnXaxis += listBitmap.get(i).getWidth() + posterProperties.singleFooterGape;
         }
 
     }

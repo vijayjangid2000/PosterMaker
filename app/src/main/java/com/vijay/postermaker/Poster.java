@@ -12,66 +12,63 @@ import java.util.List;
 
 public class Poster {
 
-    Properties properties;
+    PosterProperties posterProperties;
     Context context;
-    Utility util;
     UserData userData;
     Bitmap latestSavedBitmap;
 
-    public Poster(Context context, Bitmap posterBitmap, Bitmap faceBitmap) {
+    public Poster(Context context) {
         this.context = context;
-        userData = new UserData(context);
-        util = new Utility();
-        properties = Properties.build( posterBitmap);
-        properties.setFace(faceBitmap); // important to do so
+        userData = UserData.getInstance(context);
+        posterProperties = PosterProperties.
+                buildNewProperties(userData.getBitmapPoster());
+        posterProperties.setFace(userData.getBitmapFace()); // important to do so
+        latestSavedBitmap = getAttachedName();
     }
 
-    public Bitmap getAttachedName(){
+    public Bitmap getAttachedName() {
         View withName = new NameAttach(context, getAttachedFace());
-        latestSavedBitmap = viewToBitmap(withName, properties.posterWidth, properties.posterHeight);
-        return latestSavedBitmap;
+        return viewToBitmap(withName, posterProperties.posterWidth, posterProperties.posterHeight);
     }
 
-    public Bitmap getAttachedFace() {
-        View withFace = new FaceAttach(context, getAttachedFooter(), properties.face);
-        return viewToBitmap(withFace, properties.posterWidth, properties.posterHeight);
+    private Bitmap getAttachedFace() {
+        View withFace = new FaceAttach(context, getAttachedFooter(), posterProperties.face);
+        return viewToBitmap(withFace, posterProperties.posterWidth, posterProperties.posterHeight);
     }
 
-    public Bitmap getAttachedFooter() {
-        View view = new FooterAttach(context, properties.poster, getCombinedFooter());
-        return viewToBitmap(view, properties.posterWidth, properties.posterHeight);
+    private Bitmap getAttachedFooter() {
+        View view = new FooterAttach(context, posterProperties.poster, getCombinedFooter());
+        return viewToBitmap(view, posterProperties.posterWidth, posterProperties.posterHeight);
     }
 
-    public Bitmap getCombinedFooter() {
+    private Bitmap getCombinedFooter() {
 
         List<Bitmap> list = new ArrayList<>(); // here we get bitmaps of each id
-        list.add(getSingleFooter(userData.drawableWhsAp, userData.whatsAppInfo));
-        list.add(getSingleFooter(userData.drawableInsta, userData.InstagramInfo));
-        list.add(getSingleFooter(userData.drawableTwtr, userData.twitterInfo));
-        list.add(getSingleFooter(userData.drawableFb, userData.facebookInfo));
+        list.add(getSingleFooter(userData.getBmWhsap(), userData.whatsAppInfo));
+        list.add(getSingleFooter(userData.getBmInsta(), userData.InstagramInfo));
+        list.add(getSingleFooter(userData.getBmTwitr(), userData.twitterInfo));
+        list.add(getSingleFooter(userData.getBmFB(), userData.facebookInfo));
 
-        properties.setListSingleFooters(list); // This gives how much gape should be between the id's
+        posterProperties.setListSingleFooters(list); // This gives how much gape should be between the id's
 
         Bitmap combinedFooter = viewToBitmap(new FooterCombiner(context, list),
-                properties.footerWidth, properties.footerHeight);
+                posterProperties.footerWidth, posterProperties.footerHeight);
 
         // if gape is -ve means overlay,
         // so we decrease the ratio then create the single footers again
         //  till we reach the minimum gap (+ ve)
-        if (properties.singleFooterGape < properties.minimumSingleFooterGape) {
-            properties.reCalculateValues(0.1f);
-            Log.d("SEET", "getCombinedFooter: " + properties.footerHeightRatioToPosterHeight);
+        if (posterProperties.singleFooterGape < posterProperties.minimumSingleFooterGape) {
+            posterProperties.reCalculateValues(0.5f);
             return getCombinedFooter();
         }
 
         return combinedFooter;
     }
 
-    private Bitmap getSingleFooter(int iconDrawableId, String text) {
-        View socialMedia = new FooterCreateSingle(context, iconDrawableId, text);
-        return viewToBitmap(socialMedia, properties.currentSingleFooterWidth, properties.footerHeight);
+    private Bitmap getSingleFooter(Bitmap iconBitmap, String text) {
+        View socialMedia = new FooterCreateSingle(context, iconBitmap, text);
+        return viewToBitmap(socialMedia, posterProperties.currentSingleFooterWidth, posterProperties.footerHeight);
     }
-
 
 
     private void toast(String message) {
@@ -85,4 +82,6 @@ public class Poster {
         view.draw(canvas); // this changes the bitmap
         return bitmap;
     }
+
+
 }

@@ -3,16 +3,13 @@ package com.vijay.postermaker;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.view.View;
 
 public class FooterAttach extends View {
 
     Bitmap posterBitmap;
     Bitmap footerBitmap;
-    Properties properties;
+    PosterProperties posterProperties;
 
     public FooterAttach(Context context) {
         super(context);
@@ -21,7 +18,7 @@ public class FooterAttach extends View {
     public FooterAttach(Context context, Bitmap poster, Bitmap footer) {
         super(context);
 
-        properties = Properties.getInstance();
+        posterProperties = PosterProperties.getInstance();
         footerBitmap = footer;
         posterBitmap = poster;
 

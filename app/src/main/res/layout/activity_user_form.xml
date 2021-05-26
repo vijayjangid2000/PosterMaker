@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UserForm">
+    tools:context=".UserFormActy">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -17,10 +17,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:orientation="vertical">
-
+            android:focusableInTouchMode="true">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_name"
@@ -203,54 +202,77 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
+            <ImageView
+                android:id="@+id/iv_poster"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                tools:srcCompat="@tools:sample/avatars"
+                android:layout_margin="20dp"/>
+
+            <Button
+                android:id="@+id/btn_changePoster"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_gravity="center"
+                android:text="Select/Change Poster" />
 
             <ImageView
                 android:id="@+id/iv_face"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
+                android:layout_gravity="center"
                 android:scaleType="fitCenter"
                 tools:srcCompat="@tools:sample/avatars"
                 android:layout_margin="20dp"/>
 
             <TextView
-                android:id="@+id/tvb_changeFaceImage"
+                android:id="@+id/tv_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Here is progress"
+                android:textColor="#EEFF41"
+                android:textSize="18sp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <Button
+                android:id="@+id/btn_changeFaceImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_gravity="center"
+                android:text="Select/Change Pic" />
+
+            <TextView
+                android:id="@+id/tv_fontSample"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Change Font Below"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                />
+
+            <androidx.appcompat.widget.AppCompatSpinner
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:gravity="center"
-                android:text="Change Face"
-                android:textSize="20sp" />
+                android:id="@+id/spinner"
+                android:layout_gravity="center_horizontal"
+                />
 
-            <ImageView
-                android:id="@+id/iv_businessIcon"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:scaleType="fitCenter"
-                tools:srcCompat="@tools:sample/avatars"
-                android:layout_margin="20dp"/>
-
-            <TextView
-                android:id="@+id/tvb_businessIcon"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:gravity="center"
-                android:text="Change Poster"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/tvb_save"
-                android:layout_width="match_parent"
+            <Button
+                android:id="@+id/btn_save"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:background="@color/black"
-                android:gravity="center"
+                android:layout_gravity="center"
                 android:padding="5dp"
                 android:text="Save and Exit"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textColor="@color/white" />
 
         </LinearLayout>
     </ScrollView>

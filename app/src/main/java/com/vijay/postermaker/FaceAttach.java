@@ -3,14 +3,13 @@ package com.vijay.postermaker;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.view.View;
 
 public class FaceAttach extends View {
 
     Bitmap posterBitmap, faceBitmap;
 
-    Properties properties;
+    PosterProperties posterProperties;
 
     public FaceAttach(Context context) {
         super(context);
@@ -19,9 +18,9 @@ public class FaceAttach extends View {
     public FaceAttach(Context context, Bitmap poster, Bitmap face) {
         super(context);
 
-        properties = Properties.getInstance();
+        posterProperties = PosterProperties.getInstance();
         posterBitmap = poster;
-        faceBitmap = getPerfectSize(face);
+        faceBitmap = face;
 
     }
 
@@ -33,24 +32,10 @@ public class FaceAttach extends View {
         canvas.drawBitmap(posterBitmap, 0, 0, null);
 
         // now draw the face bitmap on canvas
-        canvas.drawBitmap(faceBitmap, properties.faceDestinationX,
-                properties.faceDestinationY, null);
+        canvas.drawBitmap(faceBitmap, posterProperties.faceDestinationX,
+                posterProperties.faceDestinationY, null);
     }
 
-    Bitmap getPerfectSize(Bitmap face) {
-        float ratio = properties.faceSizeRatioToPoster;
 
-        float hPoster, wPoster;
-
-        hPoster = posterBitmap.getHeight();
-        wPoster = posterBitmap.getWidth();
-
-        Bitmap resized = new Utility().resizeBitmap(
-                face, hPoster / ratio, wPoster / ratio);
-
-        properties.setFace(resized);
-
-        return resized;
-    }
 
 }

@@ -11,19 +11,20 @@ public class NameAttach extends View {
 
     Bitmap posterBitmap;
     Paint namePaint;
-    Properties properties;
+    PosterProperties posterProperties;
     UserData userData;
 
     public NameAttach(Context context, Bitmap bitmap) {
         super(context);
         posterBitmap = bitmap;
-        userData = new UserData(context);
-        properties = Properties.getInstance();
+        userData = UserData.getInstance();
+        posterProperties = PosterProperties.getInstance();
 
         namePaint = new Paint();
-
-        namePaint.setTextSize(properties.nameTextSize);
+        namePaint.setTextSize(posterProperties.nameTextSize);
         namePaint.setColor(Color.WHITE);
+        namePaint.setTypeface(Utility.getInstance()
+                .getSystemFontList().get(posterProperties.fontChosenKey));
 
     }
 
@@ -34,9 +35,9 @@ public class NameAttach extends View {
         // draw the poster bitmap on canvas (this is blank that's why)
         canvas.drawBitmap(posterBitmap, 0, 0, null);
 
-        canvas.drawText(userData.getName(), properties.paddingPoster,
-               properties.posterHeight - properties.footerHeight
-                - properties.paddingPoster, namePaint);
+        canvas.drawText(userData.getName(), posterProperties.paddingPoster,
+                posterProperties.posterHeight - posterProperties.footerHeight
+                        - posterProperties.paddingPoster, namePaint);
     }
 
 }
