@@ -22,5 +22,6 @@ Usage:
 
 There is a poster Class, All you need to do is:
 
-Poster poster = new Poster('filepaths'); // check the constructor
+Poster poster = new Poster('filepaths'); // check the constructor.
+
 poster.getLatestBitmap(); // it return the bitmap
